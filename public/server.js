@@ -47,20 +47,6 @@ Game.prototype.start = function () {
 }
 
 /**
- * Is game ended
- * @return {boolean}
- */
-Game.prototype.ended = function () {
-	return this.user1.guess !== 0 && this.user2.guess !== 0;
-}
-
-/**
- * Final score
- */
-Game.prototype.score = function () {
-}
-
-/**
  * User session class
  * @param {Socket} socket
  */
@@ -70,66 +56,32 @@ function User(socket) {
 	this.opponent = null;
 }
 
-/**
- * Start new game
- * @param {Game} game
- * @param {User} opponent
- */
 User.prototype.start = function (game, opponent) {
 	this.game = game;
 	this.opponent = opponent;
 	var cfg = {
         p1: this.name,
-        p2: opponent.name,
+        p2: this.opponent.name,
         role: this.role
     };
 	this.socket.emit("start", cfg);		
 };
 
-/**
- * Terminate game
- */
 User.prototype.end = function () {
-	this.game = null;
-	this.opponent = null;
-	this.guess = 0;
 	this.socket.emit("end");
+    this.game = null;
+    this.opponent = null;
 };
 
-/**
- * Trigger win event
- */
-User.prototype.win = function () {
-	this.socket.emit("win", this.opponent.guess);
-};
-
-/**
- * Trigger lose event
- */
-User.prototype.lose = function () {
-	this.socket.emit("lose", this.opponent.guess);
-};
-
-/**
- * Trigger draw event
- */
-User.prototype.draw = function () {
-	this.socket.emit("draw", this.opponent.guess);
-};
-
-/**
- * Socket.IO on connect event
- * @param {Socket} socket
- */
 module.exports = function (socket) {
 	var user = new User(socket);
 	
 	socket.on("disconnect", function () {
 		console.log("Disconnected: " + socket.id);
-		removeUser(user);
+        removeUser(user);
 		if (user.opponent) {
-			user.opponent.end();
-			findOpponent(user.opponent);
+            user.opponent.end();
+            findOpponent(user.opponent);
 		}
 	});
 
@@ -144,7 +96,7 @@ module.exports = function (socket) {
 	});
     
     socket.on("launchSub", function (cfg) {
-		console.log("LaunchSub: " + socket.id + " -> " + cfg.levels);
+		//console.log("LaunchSub: " + socket.id + " -> " + cfg.levels);
         user.opponent.socket.emit("launchSub", cfg);
 	});  
     
@@ -158,7 +110,9 @@ module.exports = function (socket) {
 		user.name = name;
         users.push(user);
         findOpponent(user);
+        console.log("Current users: " + users.length);
 	});
     
 	console.log("Connected: " + socket.id);
+    console.log("Current users: " + users.length);
 };

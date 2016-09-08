@@ -29,6 +29,10 @@ canvas {
     position: relative;
     top: -200px;
 }
+#playerName {
+    text-align: center;
+    font-weight: bold;
+}
 .hidden {
     display: none;
 }
