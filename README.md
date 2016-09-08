@@ -6,6 +6,7 @@ TO-DOs:
 - Hide the info screen
 - Solve the sub score issues
 - Solve the disconnection issues
+- Check if server supports multiple connections and disconnections
 - Give replay option to players at game end
 - Add small tutorial
 - Add glitchs, rotations and screen magic to add fun
