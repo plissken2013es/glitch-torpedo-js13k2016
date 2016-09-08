@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Subs multiplayer</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <script src="/socket.io/socket.io.js"></script>
+
+        <script src="js/jsfxr.min.js"></script>    
+        <script src="js/resources.js"></script>
+        <script src="js/sprite.js"></script>
+        <script src="js/input.js"></script>
+        <script src="js/main.js"></script>
+        
+        <div id="wrapper">
+            <div id="playerSelect">
+                <h1 id="message">Welcome. Please enter your name.</h1>
+                <div id="buttons">
+                    <input type="text" id="playerName" value="Player" /> <button id="sendName">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/client.js"></script>
+    </body>
+</html>
