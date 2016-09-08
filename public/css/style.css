@@ -1,5 +1,6 @@
 body {
     text-align: center;
+    font-family: "Lucida Console", Monaco, monospace;
 }
 canvas {
     margin: 0 auto;
@@ -13,11 +14,11 @@ canvas {
 #wrapper {
     width: 100%;
     position: relative;
-    font: 12px "Lucida Console", Monaco, monospace;
     color: white;
     line-height: 256px;
     display: block;
     top: -468px;
+    font-size: 10px;
 }
 #playerSelect {
     background: rgba(0, 0, 0, 0.5);
@@ -32,6 +33,11 @@ canvas {
 #playerName {
     text-align: center;
     font-weight: bold;
+}
+#online {
+    position: relative;
+    top: -20px;
+    font-size: 14px;
 }
 .hidden {
     display: none;

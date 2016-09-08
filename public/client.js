@@ -2,17 +2,21 @@
 
 (function () {
 
-    var socket, sendBtn, message, playerName, buttons, playerSelect;
+    var socket, sendBtn, message, playerName, buttons, playerSelect, online;
 
     function setMessage(text) {
         message.innerHTML = text;
     }
     
     function displayScore(text) {
-        score.innerHTML = text;
+        online.innerHTML = text;
     }
 
     function bindClient() {
+        socket.on("welcome", function (num) {
+             displayScore("Current players online: " + num);
+        });
+        
         socket.on("start", function (cfg) {
             cfg.socket = socket;
             initGame(false, cfg);
@@ -75,6 +79,7 @@
         sendBtn = document.getElementById("sendName");
         message = document.getElementById("message");
         buttons = document.getElementById("buttons");
+        online = document.getElementById("online");
         
         bindClient();
     }

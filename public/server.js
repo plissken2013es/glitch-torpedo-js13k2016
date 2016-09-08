@@ -113,6 +113,8 @@ module.exports = function (socket) {
         console.log("Current users: " + users.length);
 	});
     
+    user.socket.emit("welcome", users.length);
+    
 	console.log("Connected: " + socket.id);
     console.log("Current users: " + users.length);
 };

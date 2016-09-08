@@ -7,6 +7,7 @@ TO-DOs:
 (done) Solve the sub score issues
 (done) Solve the disconnection issues
 (done) Check if server supports multiple connections and disconnections
+(done) Number of online players
 - Give replay option to players at game end
 - Latency time for ship?
 - Syncronize sinking?
