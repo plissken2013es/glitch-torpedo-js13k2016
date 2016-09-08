@@ -9,6 +9,7 @@ TO-DOs:
 (done) Check if server supports multiple connections and disconnections
 - Give replay option to players at game end
 - Latency time for ship?
+- Syncronize sinking?
 - Add small tutorial
 - Add glitchs, rotations and screen magic to add fun
 - Add ninja mode for subs (optional)
