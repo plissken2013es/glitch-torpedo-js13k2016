@@ -372,7 +372,7 @@
             }
         }
 
-        if (!isGameOver && role == "sub") timeout = setTimeout(launchSub.bind(this), rand(3500, 9000));
+        if ((!isGameOver && role == "sub") || demoMode) timeout = setTimeout(launchSub.bind(this), rand(3500, 9000));
     }
 
     function drawText(x, y, txt, color) {
