@@ -2,7 +2,7 @@
 
 (function () {
 
-    var socket, sendBtn, message, playerName, buttons, playerSelect, online;
+    var socket, sendBtn, message, playerName, buttons, playerSelect, online, tutorial;
 
     function setMessage(text) {
         message.innerHTML = text;
@@ -22,6 +22,7 @@
             initGame(false, cfg);
             setTimeout(function() {
                 playerSelect.className = "hidden";
+                tutorial.className = "hidden";
             }, 1000);
         });
 /*
@@ -96,6 +97,7 @@
         message = document.getElementById("message");
         buttons = document.getElementById("buttons");
         online = document.getElementById("online");
+        tutorial = document.getElementById("tutorial");
         
         bindClient();
     }
