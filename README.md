@@ -10,6 +10,7 @@ TO-DOs:
 (done) Number of online players
 (done) Latency time for ship after being sunk
 (done) Syncronize sinking
+- Improve ship movement network traffic
 - Give replay option to players at game end
 - Add small tutorial
 - Review disconnection issues with 2 players
