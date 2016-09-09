@@ -9,8 +9,8 @@ TO-DOs:
 (done) Check if server supports multiple connections and disconnections
 (done) Number of online players
 (done) Latency time for ship after being sunk
+(done) Syncronize sinking
 - Give replay option to players at game end
-- Syncronize sinking?
 - Add small tutorial
 - Review disconnection issues with 2 players
 - Add glitchs, rotations and screen magic to add fun
