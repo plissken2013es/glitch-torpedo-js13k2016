@@ -24,10 +24,14 @@
                 playerSelect.className = "hidden";
             }, 1000);
         });
-
+/*
         socket.on("shipPosition", function (pos) {
             receiveShipPosition(pos);
         });  
+*/
+        socket.on("controls", function(ev, pos) {
+            receiveShipPosition(ev, pos);
+        });
         
         socket.on("syncronizeSunk", function () {
             receiveShipSunk();
@@ -171,7 +175,7 @@
 
     var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 14, numTorpedoes = 4, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
 
-    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt;
+    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight;
 
     start(true); // demo mode ON
     //start(); // demo mode OFF
@@ -181,7 +185,7 @@
             pos: [canvas.width/2 - 20, 32 - 13],
             sprite: new Sprite("img/s.png", [0, 0], [40, 13], 0, [0])
         };
-        shipImmune = false;
+        shipImmune = movingLeft = movingRight = false;
         lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = 0;
         isGameOver = false; 
         charges = [];
@@ -377,7 +381,23 @@
         }
     }
 
-    function receiveShipPosition(pos) {
+    function receiveShipPosition(ev, pos) {
+        switch (ev) {
+            case "LU":
+                movingLeft = false;
+                break;
+            case "LD":
+                movingLeft = true;
+                break;
+            case "RU":
+                movingRight = false;
+                break;
+            case "RD":
+                movingRight = true;
+                break;
+            default:
+                movingLeft = movingRight = false;
+        }
         ship.pos[0] = pos;
     }
     
@@ -401,12 +421,23 @@
         if (demoMode) return;
 
         if (!ship.isSinking && role == "ship") {
+            var p = ship.pos[0];
             if (input.isDown("LEFT") || input.isDown("a")) {
                 ship.pos[0] -= shipSpeed * dt;
-            }
-
-            if (input.isDown("RIGHT") || input.isDown("d")) {
+                if (!movingLeft) socket.emit("controls", "LD", p);
+                if (movingRight) socket.emit("controls", "RU", p);
+                movingLeft = true;
+                movingRight = false;
+            } else if (input.isDown("RIGHT") || input.isDown("d")) {
                 ship.pos[0] += shipSpeed * dt;
+                if (!movingRight) socket.emit("controls", "RD", p);
+                if (movingLeft) socket.emit("controls", "LU", p);
+                movingRight = true;
+                movingLeft = false;
+            } else {
+                if (movingLeft) socket.emit("controls", "LU", p);
+                if (movingRight) socket.emit("controls", "RU", p);
+                movingLeft = movingRight = false;
             }
 
             if ((input.isDown("z") || input.isDown("n")) && numCharges > charges.length && Date.now() - lastFireCharge > 750) {
@@ -415,6 +446,10 @@
             if ((input.isDown("x") || input.isDown("m")) && numCharges > charges.length && Date.now() - lastFireCharge > 750) {
                 launchCharge(+44);
             }
+        }
+        if (!ship.isSinking && role == "sub") {
+            if (movingLeft) ship.pos[0] -= shipSpeed * dt;
+            if (movingRight) ship.pos[0] += shipSpeed * dt;
         }
 
         // debug option, remember to delete this
@@ -436,7 +471,7 @@
         // Update the player sprite animation
         ship.sprite.update(dt);
         checkShipBounds();
-        if (role == "ship") sendShipPosition();
+        //if (role == "ship") sendShipPosition();
 
         // Update subs
         for (i=0; i<subs.length; i++) {

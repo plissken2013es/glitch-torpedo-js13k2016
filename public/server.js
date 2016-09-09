@@ -84,10 +84,15 @@ module.exports = function (socket) {
             findOpponent(user.opponent);
 		}
 	});
-
+/*
     socket.on("shipPosition", function (pos) {
 		//console.log("Ship position: " + socket.id + " -> " + pos);
         user.opponent.socket.emit("shipPosition", pos);
+	});
+*/  
+    socket.on("controls", function (ev, pos) {
+		//console.log("Ship controls: " + socket.id + " -> " + ev);
+        user.opponent.socket.emit("controls", ev, pos);
 	});
     
     socket.on("syncronizeSunk", function () {
