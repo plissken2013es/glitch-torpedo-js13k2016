@@ -33,8 +33,8 @@
             receiveShipPosition(ev, pos);
         });
         
-        socket.on("syncronizeSunk", function () {
-            receiveShipSunk();
+        socket.on("syncronizeSunk", function (score) {
+            receiveShipSunk(score);
         });  
         
         socket.on("launchCharge", function (pos) {
@@ -373,13 +373,31 @@
         ctx.textAlign = "center";
         ctx.fillText(txt, x, y); 
     }
+    
+    function drawFilter () {
+        var i = 0,
+            width = 3,
+            separation = width + 1,
+            count = canvas.height  / separation;
+        netCnt ++;
+        if (netCnt > separation) netCnt = 0;
 
+        ctx.fillStyle = 'rgba(200, 200, 0, 0.12)';
+        ctx.beginPath();
+        while (++i < count) {
+            ctx.rect(0, (i-1) * separation + netCnt, canvas.width, width);
+        }
+        ctx.fill();
+    }
+
+    /*
     function sendShipPosition() {
         if (netCnt++ == 1) {
             netCnt = 0;
             socket.emit("shipPosition", ship.pos[0]);
         }
     }
+    */
 
     function receiveShipPosition(ev, pos) {
         switch (ev) {
@@ -387,7 +405,7 @@
                 movingLeft = false;
                 break;
             case "LD":
-                movingLeft = true;
+                movingLeft = true;55
                 break;
             case "RU":
                 movingRight = false;
@@ -401,10 +419,11 @@
         ship.pos[0] = pos;
     }
     
-    function receiveShipSunk() {
+    function receiveShipSunk(score) {
         console.log("syncronizing ship sunk!");
         if (!ship.isSinking) {
             sunkShip();
+            scorePlayerSub += score;
         }
     }
 
@@ -550,7 +569,7 @@
                 if (!ship.isSinking && !shipImmune && !(torp.pos[0]+4<ship.pos[0] || torp.pos[0]>ship.pos[0]+40)) {
                     scorePlayerSub += torp.score;
                     sunkShip();
-                    socket.emit("syncronizeSunk");
+                    socket.emit("syncronizeSunk", torp.score);
                     console.log("ship sunk! scored " + torp.score + " points!");
                 }
                 var explosion = {
@@ -714,6 +733,9 @@
                     14, 6);
         }
 
+        // Draw retro arcade filter
+        drawFilter();
+        
         // Render to the main screen
         screenCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, screen.width, screen.height);
     }
