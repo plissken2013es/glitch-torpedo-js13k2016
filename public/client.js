@@ -29,6 +29,10 @@
             receiveShipPosition(pos);
         });  
         
+        socket.on("syncronizeSunk", function () {
+            receiveShipSunk();
+        });  
+        
         socket.on("launchCharge", function (pos) {
             launchCharge(pos);
         });  
@@ -376,6 +380,13 @@
     function receiveShipPosition(pos) {
         ship.pos[0] = pos;
     }
+    
+    function receiveShipSunk() {
+        console.log("syncronizing ship sunk!");
+        if (!ship.isSinking) {
+            sunkShip();
+        }
+    }
 
     // Update game objects
     function update(dt) {
@@ -503,13 +514,8 @@
                 torpedoes.splice(i, 1);
                 if (!ship.isSinking && !shipImmune && !(torp.pos[0]+4<ship.pos[0] || torp.pos[0]>ship.pos[0]+40)) {
                     scorePlayerSub += torp.score;
-                    ship.isSinking = true;
-                    ship.sprite.frames = [0, 1, 2, 3];
-                    ship.sprite.once = true;
-                    ship.sprite.speed = 2;
-                    setTimeout(launchShip.bind(this), 2500);
-                    aa.play("a");
-                    bodyCount.push(1);
+                    sunkShip();
+                    socket.emit("syncronizeSunk");
                     console.log("ship sunk! scored " + torp.score + " points!");
                 }
                 var explosion = {
@@ -584,6 +590,16 @@
         console.log(points);
     }
 
+    function sunkShip() {
+        ship.isSinking = true;
+        ship.sprite.frames = [0, 1, 2, 3];
+        ship.sprite.once = true;
+        ship.sprite.speed = 2;
+        setTimeout(launchShip.bind(this), 2500);
+        aa.play("a");
+        bodyCount.push(1);
+    }
+    
     // Draw everything
     function render() {
         ctx.fillStyle = "#4487c9";

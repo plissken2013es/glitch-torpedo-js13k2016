@@ -90,6 +90,11 @@ module.exports = function (socket) {
         user.opponent.socket.emit("shipPosition", pos);
 	});
     
+    socket.on("syncronizeSunk", function () {
+		console.log("Ship is sunk! " + socket.id);
+        user.opponent.socket.emit("syncronizeSunk");
+	});
+    
     socket.on("launchCharge", function (pos) {
 		//console.log("LaunchCharge: " + socket.id + " -> " + pos);
         user.opponent.socket.emit("launchCharge", pos);
