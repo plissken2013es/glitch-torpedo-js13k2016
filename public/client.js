@@ -69,6 +69,14 @@
             setMessage("Connection error!");
         });
         
+        socket.on("glitch", function (gs) {
+            receiveGlitch(gs);
+        });        
+        
+        socket.on("rot", function (r, t) {
+            receiveRot(r, t);
+        });
+        
         sendBtn.addEventListener("click", function (e) {
             socket.emit("name", playerName.value);
             buttons.className = "hidden";
@@ -175,7 +183,7 @@
 
     var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 14, numTorpedoes = 4, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
 
-    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight;
+    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot;
 
     start(true); // demo mode ON
     //start(); // demo mode OFF
@@ -188,6 +196,7 @@
         shipImmune = movingLeft = movingRight = false;
         lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = 0;
         isGameOver = false; 
+        rot = [0, 0, 0];
         charges = [];
         chargeExplosions = [];
         subs = [];
@@ -236,7 +245,7 @@
             playerShipName = "PLAYER 1";
             playerSubName = "PLAYER 2";
         }
-
+        
         initLevels();
         console.log(role, demoMode);
         if (role === "sub" || demoMode) {
@@ -374,7 +383,7 @@
         ctx.fillText(txt, x, y); 
     }
     
-    function drawFilter () {
+    function drawFilter() {
         var i = 0,
             width = 3,
             separation = width + 1,
@@ -388,6 +397,42 @@
             ctx.rect(0, (i-1) * separation + netCnt, canvas.width, width);
         }
         ctx.fill();
+    }
+    
+    function drawSquare(g) {
+        var pos = g[0];
+        var size = g[1];
+        var col = g[2];
+        ctx.fillStyle = "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + col[3] + ")";
+        ctx.beginPath();
+        ctx.rect(pos[0], pos[1], size[0], size[1], col);
+        ctx.fill();
+    }
+    
+    function receiveGlitch(gs) {
+        console.log("glitch received", gs);
+        if (gs.length) {
+            var g = gs.pop();
+            glitch = g[0];
+            setTimeout(function() {
+                receiveGlitch.call(this, gs);
+            }, g[1]);
+        } else {
+            glitch = [];
+        }
+    }
+    
+    function drawGlitch() {
+        for (var q=0; q<glitch.length; q++) {
+            drawSquare(glitch[q]);
+        }
+    }
+    
+    function receiveRot(r, t) {
+        rot = r;
+        setTimeout(function() {
+            rot = [0, 0, 0];
+        }.bind(this), t);
     }
 
     /*
@@ -733,11 +778,19 @@
                     14, 6);
         }
 
+        // Draw glitch
+        if (glitch.length) drawGlitch();
+        
         // Draw retro arcade filter
         drawFilter();
         
         // Render to the main screen
-        screenCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, screen.width, screen.height);
+        screenCtx.save();
+        screenCtx.translate(256, 224);
+        screenCtx.rotate(rot[0]);
+        screenCtx.translate(-256, -224);
+        screenCtx.drawImage(canvas, rot[1], rot[2], canvas.width, canvas.height, 0, 0, screen.width, screen.height);
+        screenCtx.restore();
     }
 
     function renderEntity(entity) {

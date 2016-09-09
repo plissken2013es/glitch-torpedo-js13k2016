@@ -36,6 +36,52 @@ function Game(user1, user2) {
     user2.role = "ship";
 	this.user1 = user1;
 	this.user2 = user2;
+    this.lG = Math.floor(Math.random()*5) + 5;
+    this.cnt = 0;
+}
+
+function generateGlitch() {
+    var glitch = [];
+    var q = rand(30, 60);
+    for (var j=0; j<q; j++) {
+        var pos = [rand(0, 256), rand(0, 216)];
+        var size = [rand(10, 30), rand(15, 40)];
+        var color = [rand(0, 255), rand(0, 255), rand(0, 255), Math.random()*0.5 + 0.5];
+        glitch.push([pos, size, color]);
+    }
+    return glitch;
+}
+
+function rand(a, b) {
+    return Math.floor(Math.random() * (b-a+1)) + a;
+}
+
+function checkG(u) {
+    if (u.game.cnt++ > u.game.lG) {
+        u.game.cnt = 0;
+        u.game.lG = Math.floor(Math.random()*5) + 5;
+        
+        var q = rand(2, 7);
+        var gs = [];
+        for (var i=0; i<q; i++) {
+            var g = generateGlitch();
+            var t = rand(75, 500);
+            gs.push([g, t]);
+        }
+        u.socket.emit("glitch", gs);
+        u.opponent.socket.emit("glitch", gs);
+        
+        if (rand(0, 1)) {
+            var p = Math.PI;
+            var r = [];
+            r[0] = rand(0, 1) ? p/2 : rand(0,1) ? -p/2 : p;
+            r[1] = rand(-25, 25);
+            r[2] = rand(-25, 25);
+            var t = rand(1500, 3500);
+            u.socket.emit("rot", r, t);
+            u.opponent.socket.emit("rot", r, t);
+        }
+    } 
 }
 
 /**
@@ -103,6 +149,7 @@ module.exports = function (socket) {
     socket.on("launchCharge", function (pos) {
 		//console.log("LaunchCharge: " + socket.id + " -> " + pos);
         user.opponent.socket.emit("launchCharge", pos);
+        checkG(user);
 	});
     
     socket.on("launchSub", function (cfg) {
@@ -113,6 +160,7 @@ module.exports = function (socket) {
     socket.on("launchTorpedo", function (pos, updateSub) {
 		//console.log("launchTorpedo: " + socket.id + " -> " + pos);
         user.opponent.socket.emit("launchTorpedo", pos, updateSub);
+        checkG(user);
 	});
     
 	socket.on("name", function (name) {
