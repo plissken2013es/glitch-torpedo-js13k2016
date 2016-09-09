@@ -87,6 +87,9 @@
     window.addEventListener("load", initClient, false);
     
     // ----------------------------------------------------------------------------------------
+    // ------------------------------------- M I  G M  ----------------------------------------
+    // -------------------------------------  A N  A E ----------------------------------------
+    // ----------------------------------------------------------------------------------------
     var requestAnimFrame = (function(){
         return window.requestAnimationFrame    ||
             window.webkitRequestAnimationFrame ||
@@ -164,7 +167,7 @@
 
     var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 14, numTorpedoes = 4, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
 
-    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt;
+    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt;
 
     start(true); // demo mode ON
     //start(); // demo mode OFF
@@ -174,7 +177,8 @@
             pos: [canvas.width/2 - 20, 32 - 13],
             sprite: new Sprite("img/s.png", [0, 0], [40, 13], 0, [0])
         };
-        lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = 0;
+        shipImmune = false;
+        lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = 0;
         isGameOver = false; 
         charges = [];
         chargeExplosions = [];
@@ -298,6 +302,8 @@
     }
 
     function launchShip() {
+        shipImmune = true;
+        immuneCnt = 0;
         ship.isSinking = false;
         ship.sprite.speed = 0;
         ship.sprite.frames = [0];
@@ -400,6 +406,11 @@
             }
         }
 
+        // debug option, remember to delete this
+        if (input.isDown("i")) {
+            shipImmune = true;
+            immuneCnt = 0;
+        }
 
         for (var i=0; i<indicators.length; i++) {
             if (role == "sub" && numTorpedoes > torpedoes.length && Date.now() - lastFireTorpedo > 1250 && input.isDown(indicators[i].value.toString())) {
@@ -490,7 +501,7 @@
 
             if (torp.pos[1] <= 32) {
                 torpedoes.splice(i, 1);
-                if (!ship.isSinking && !(torp.pos[0]+4<ship.pos[0] || torp.pos[0]>ship.pos[0]+40)) {
+                if (!ship.isSinking && !shipImmune && !(torp.pos[0]+4<ship.pos[0] || torp.pos[0]>ship.pos[0]+40)) {
                     scorePlayerSub += torp.score;
                     ship.isSinking = true;
                     ship.sprite.frames = [0, 1, 2, 3];
@@ -581,7 +592,19 @@
         ctx.fillRect(0, 32, canvas.width, 184);
 
         // render ship player
-        renderEntity(ship);
+        var renderShip = false;
+        if (shipImmune) {
+            if (immuneCnt++ % 3 == 0) renderShip = true;
+            if (immuneCnt > 150) {
+                shipImmune = false;
+                immuneCnt = 0;
+            }
+        } else {
+            renderShip = true;
+        }
+        if (renderShip) {
+            renderEntity(ship);
+        }
 
         // print indicator lines
         for (var i=0; i < indicators.length; i++) {
