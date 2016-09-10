@@ -13,6 +13,7 @@ TO-DOs:
 (done) Improve ship movement network traffic
 (done) Add glitchs, rotations and screen magic to add fun
 (done) Add small tutorial
+(done) Paint a nice? cover for this game
 - Give replay option to players at game end
 - Review disconnection issues with 2 players
 - Remove console.logs & join JS in one file
