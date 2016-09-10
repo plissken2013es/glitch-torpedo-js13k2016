@@ -14,8 +14,8 @@ TO-DOs:
 (done) Add glitchs, rotations and screen magic to add fun
 (done) Add small tutorial
 (done) Paint a nice? cover for this game
-- Give replay option to players at game end
-- Review disconnection issues with 2 players
-- Remove console.logs & join JS in one file
-- Add ninja mode for subs (optional)
+(done) Add ninja mode for subs (optional)
 - Add music (optional)
+- Remove console.logs & join JS in one file
+- Review disconnection issues with 2 players
+- Give replay option to players at game end

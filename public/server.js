@@ -153,6 +153,10 @@ module.exports = function (socket) {
     socket.on("launchSub", function (cfg) {
 		//console.log("LaunchSub: " + socket.id + " -> " + cfg.levels);
         user.opponent.socket.emit("launchSub", cfg);
+	});    
+    
+    socket.on("silent", function () {
+        user.opponent.socket.emit("silent");
 	});  
     
     socket.on("launchTorpedo", function (pos, updateSub) {

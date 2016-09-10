@@ -44,6 +44,15 @@
             console.log("my opponent had launched a sub", cfg.levels);
             launchSub(cfg);
         });    
+                
+        socket.on("silent", function () {
+            console.log("my opponent had entered silent running");
+            if (role == "ship" && silentRunning>0) {
+                silentRunning--;
+                silentCnt = 720;
+                aa.play("f");
+            }
+        });    
         
         socket.on("launchTorpedo", function (pos, updateSub) {
             launchTorpedo(pos, updateSub);
@@ -163,6 +172,10 @@
     aa.add("e", 5, [
         [2,,0.1926,,0.1814,0.209,,0.3425,,,,,,,,0.5793,,,1,,,,,0.31]
     ]);
+    
+    aa.add("f", 5, [
+        [2,,0.3895,,0.4194,0.2692,,0.1371,,0.6871,0.3262,,,,,,,,1,,,,,0.5]
+    ]);
     // Arcade Audio ----------------------------------
 
     // Create the canvas
@@ -183,7 +196,7 @@
 
     var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 16, numTorpedoes = 3, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2", tutSeen = false;
 
-    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot, tutCnt, tutoTxt1, tutoTxt2;
+    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot, tutCnt, tutoTxt1, tutoTxt2, silentRunning, silentCnt;
 
     start(true); // demo mode ON
     //start(); // demo mode OFF
@@ -196,8 +209,9 @@
         shipImmune = movingLeft = movingRight = false;
         tutoTxt1 = tutoTxt2 = "";
         if (!demoMode) tutSeen = true;
-        lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = tutCnt = 0;
+        lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = tutCnt = silentCnt = 0;
         isGameOver = false; 
+        silentRunning = 1;
         rot = [0, 0, 0];
         charges = [];
         chargeExplosions = [];
@@ -554,20 +568,29 @@
                 }
                 break;
             case 1660:
-                tutoTxt2 = "Deeper torpedoes score more.";
+                tutoTxt2 = "Deeper launched torpedoes score more points.";
                 break;
-            case 1860:
+            case 1890:
                 tutoTxt1 = "There's a delay between each charge launch.";
                 tutoTxt2 = "There's a delay between each torpedo launch.";
                 break;
             case 2120:
+                tutoTxt1 = "One more thing: Sub player may press 'SPACE'";
+                tutoTxt2 = "to enter 'Silent running' mode.";
+                break;
+            case 2320:
+                tutoTxt1 = "The subs remain invisible for a short time.";
+                tutoTxt2 = "There's only 1 silent running per game.";
+                silentCnt = 400;
+                break;
+            case 2720:
                 tutoTxt1 = "When time ends, the best score wins.";
                 tutoTxt2 = "";
                 break;
-            case 2300:
+            case 2900:
                 tutoTxt1 = "Good luck, captain!";
                 break;
-            case 2600:
+            case 3200:
                 tutoTxt1 = "";
                 break;
         }
@@ -608,10 +631,11 @@
             }
         }
 
-        // debug option, remember to delete this
-        if (input.isDown("i")) {
-            shipImmune = true;
-            immuneCnt = 0;
+        if (role == "sub" && silentRunning>0 && input.isDown("SPACE")) {
+            socket.emit("silent");
+            silentCnt = 720;
+            silentRunning--;
+            aa.play("f");
         }
 
         for (var i=0; i<indicators.length; i++) {
@@ -722,6 +746,9 @@
             if (e.done) torpedoExplosions.splice(i, 1);
             e.update(dt);
         }
+        
+        // silent running
+        if (silentCnt > 0) silentCnt--;
     }
 
     function updateTimer() {
@@ -822,7 +849,10 @@
         renderEntities(chargeExplosions);
         renderEntities(torpedoes);
         renderEntities(torpedoExplosions);
-        renderEntities(subs);
+        var renderSubs = false;
+        if (role == "ship" && silentCnt<=0 && !demoMode) renderSubs = true;
+        if ((role == "sub" || demoMode) && (silentCnt % 6 == 0)) renderSubs = true;
+        if (renderSubs) renderEntities(subs);
         renderEntities(points);
 
         // print available charges
