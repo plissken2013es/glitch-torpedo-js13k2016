@@ -12,8 +12,9 @@ TO-DOs:
 (done) Syncronize sinking
 (done) Improve ship movement network traffic
 (done) Add glitchs, rotations and screen magic to add fun
+(done) Add small tutorial
 - Give replay option to players at game end
-- Add small tutorial
 - Review disconnection issues with 2 players
+- Remove console.logs & join JS in one file
 - Add ninja mode for subs (optional)
 - Add music (optional)

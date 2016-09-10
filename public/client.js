@@ -1,5 +1,3 @@
-"use strict";
-
 (function () {
 
     var socket, sendBtn, message, playerName, buttons, playerSelect, online, tutorial;
@@ -183,7 +181,7 @@
     screenCtx.imageSmoothingEnabled = false; /// future
     document.body.appendChild(screen);
 
-    var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 16, numTorpedoes = 3, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
+    var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 16, numTorpedoes = 3, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2", tutSeen = false;
 
     var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot, tutCnt, tutoTxt1, tutoTxt2;
 
@@ -197,6 +195,7 @@
         };
         shipImmune = movingLeft = movingRight = false;
         tutoTxt1 = tutoTxt2 = "";
+        if (!demoMode) tutSeen = true;
         lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = tutCnt = 0;
         isGameOver = false; 
         rot = [0, 0, 0];
@@ -314,7 +313,7 @@
             pos: pos,
             sprite: new Sprite("img/sut.png", [0, 0], [3, 3], 4, [0, 1, 0, 1, 0, 0])
         };
-        torp.score = 100 + (torp.pos[1] - 40) * 5;
+        torp.score = 100 + (torp.pos[1] - 40) * 2;
         console.log("Launched torpedo. " + torp.score + " potential points.");
         torpedoes.push(torp);
         aa.play("e");
@@ -483,13 +482,11 @@
 
         if (isGameOver) return; 
         handleInput(dt);
-        if (demoMode) updateTuto();
+        if (demoMode && !tutSeen) updateTuto();
         updateEntities(dt);
     }  
     
     function updateTuto() {
-        //tutoTxt1 = tutoTxt2 = "";
-        //movingRight = movingLeft = false;
         switch (tutCnt) {
             case 1:
                 tutoTxt1 = "Ship player may use LEFT/RIGHT arrows to move.";
@@ -655,7 +652,7 @@
             if (killSub) {
                 subs.splice(i, 1);
                 points.splice(i, 1);
-                if (role == "sub") subsAvailable.push(indicators.splice(i, 1)[0].value);
+                if (role == "sub" || demoMode) subsAvailable.push(indicators.splice(i, 1)[0].value);
                 levels.push(s.pos[1]);
             }
         }
@@ -731,7 +728,7 @@
         if (timeLeft-- <= 0) {
             timeLeft = 0;
             clearInterval(timeInterval);
-            isGameOver = true;
+            if (!demoMode) isGameOver = true;
         }
     }
 
