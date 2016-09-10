@@ -183,7 +183,7 @@
     screenCtx.imageSmoothingEnabled = false; /// future
     document.body.appendChild(screen);
 
-    var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 14, numTorpedoes = 4, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
+    var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 16, numTorpedoes = 3, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
 
     var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot;
 
@@ -209,7 +209,7 @@
         indicators = [];
         torpedoes = [];
         torpedoExplosions = [];
-        timeLeft = 199;
+        timeLeft = 99;
         bodyCount = [];
         clearTimeout(timeout);
         clearInterval(timeInterval);
