@@ -185,7 +185,7 @@
 
     var shipSpeed = 28, chargeSpeed = 14, numCharges = 6, subScores = [20, 30, 50, 60, 70, 80], subSpeed = 6, torpedoSpeed = 16, numTorpedoes = 3, demoMode = false, playerShipName = "PLAYER 1", playerSubName = "PLAYER 2";
 
-    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot;
+    var ship, lastTime, gameTime, isGameOver, charges, chargeExplosions, lastFireCharge, subs, points, subsAvailable,  activeSubs, levels, indicators, indCnt, torpedoes, torpedoExplosions, lastFireTorpedo, scorePlayerShip, scorePlayerSub, timeLeft, timeInterval, bodyCount, role, timeout, netCnt, shipImmune, immuneCnt, movingLeft, movingRight, glitch = [], rot, tutCnt, tutoTxt1, tutoTxt2;
 
     start(true); // demo mode ON
     //start(); // demo mode OFF
@@ -196,7 +196,8 @@
             sprite: new Sprite("img/s.png", [0, 0], [40, 13], 0, [0])
         };
         shipImmune = movingLeft = movingRight = false;
-        lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = 0;
+        tutoTxt1 = tutoTxt2 = "";
+        lastTime = gameTime = lastFireCharge = indCnt = lastFireTorpedo = scorePlayerShip = scorePlayerSub = netCnt = immuneCnt = tutCnt = 0;
         isGameOver = false; 
         rot = [0, 0, 0];
         charges = [];
@@ -273,7 +274,7 @@
         ]);
         resources.onReady(initGame);    
     }
-
+    
     function initLevels() {
         for (var i=0; i<8; i++) {
             levels.push(40 + i*20);
@@ -302,7 +303,7 @@
     }    
 
     function launchTorpedo(pos, updateSub) {
-        if (role == "sub") {
+        if (role == "sub" && !demoMode) {
             socket.emit("launchTorpedo", pos, updateSub);
         } else if (updateSub) {
             console.log("updating sub ", updateSub[0], "to:", updateSub[1][0]);
@@ -355,7 +356,7 @@
             };
             points.push(score);
 
-            if (role == "sub") {
+            if (role == "sub" || demoMode) {
                 var indicator = {
                     pos: sub.pos[1] + 8,
                     value: subsAvailable.shift()
@@ -377,8 +378,10 @@
         if ((!isGameOver && role == "sub") || demoMode) timeout = setTimeout(launchSub.bind(this), rand(3500, 9000));
     }
 
-    function drawText(x, y, txt, color) {
-        ctx.font = "9px Lucida Console, Monaco, monospace";
+    function drawText(x, y, txt, color, size) {
+        var sz = 9;
+        if (size) sz = size;
+        ctx.font = sz + "px Lucida Console, Monaco, monospace";
         ctx.fillStyle = color || "red";
         ctx.textBaseline = "top";
         ctx.textAlign = "center";
@@ -480,10 +483,104 @@
 
         if (isGameOver) return; 
         handleInput(dt);
+        if (demoMode) updateTuto();
         updateEntities(dt);
     }  
+    
+    function updateTuto() {
+        //tutoTxt1 = tutoTxt2 = "";
+        //movingRight = movingLeft = false;
+        switch (tutCnt) {
+            case 1:
+                tutoTxt1 = "Ship player may use LEFT/RIGHT arrows to move.";
+                break;
+            case 60:
+                movingLeft = true;
+                break;
+            case 120:
+                movingRight = true;
+                movingLeft = false;
+                break;
+            case 180:
+                movingRight = false;
+                break;
+            case 240:
+                tutoTxt1 = "May use 'A' and 'D' keys too.";
+                movingRight = true;
+                break;
+            case 300:
+                movingRight = false;
+                movingLeft = true;
+                break;
+            case 360:
+                movingLeft = false;
+                break;
+            case 400:
+                tutoTxt1 = "'Z' and 'X' keys launch depth charges.";
+                break;
+            case 490:
+                launchCharge(-8);
+                break;
+            case 550:
+                launchCharge(+44);
+                break;
+            case 610:
+                launchCharge(+44);
+                tutoTxt1 = "Or use 'M' and 'N' keys if you prefer.";
+                break;
+            case 800:
+                tutoTxt1 = "Ship has " + numCharges + " charges, reloaded when exploded.";
+                break;
+            case 980:
+                tutoTxt1 = "Each submarine scores differently.";
+                break;
+            case 1100:
+                tutoTxt1 = "";
+                tutoTxt2 = "Submarine player does't control movement, but...";
+                break;
+            case 1280:
+                tutoTxt2 = "may fire torpedoes from all available subs...";
+                break;
+            case 1460:
+                tutoTxt2 = "by pressing numbers from 1 to 8.";
+                break;
+            case 1500:
+                for (var i=0; i<3; i++) {
+                    (function(i) {
+                        setTimeout(function() {
+                            if (subs[i]) {
+                                var pos = subs[i].pos;
+                                launchTorpedo([pos[0] + subs[i].sprite.size[0]/2, pos[1]]);
+                            }
+                        }.bind(this), i*750);
+                    })(i);
+                }
+                break;
+            case 1660:
+                tutoTxt2 = "Deeper torpedoes score more.";
+                break;
+            case 1860:
+                tutoTxt1 = "There's a delay between each charge launch.";
+                tutoTxt2 = "There's a delay between each torpedo launch.";
+                break;
+            case 2120:
+                tutoTxt1 = "When time ends, the best score wins.";
+                tutoTxt2 = "";
+                break;
+            case 2300:
+                tutoTxt1 = "Good luck, captain!";
+                break;
+            case 2600:
+                tutoTxt1 = "";
+                break;
+        }
+    }
 
     function handleInput(dt) {
+        if ((!ship.isSinking && role == "sub") || demoMode) {
+            if (movingLeft) ship.pos[0] -= shipSpeed * dt;
+            if (movingRight) ship.pos[0] += shipSpeed * dt;
+        }
         if (demoMode) return;
 
         if (!ship.isSinking && role == "ship") {
@@ -513,10 +610,6 @@
                 launchCharge(+44);
             }
         }
-        if (!ship.isSinking && role == "sub") {
-            if (movingLeft) ship.pos[0] -= shipSpeed * dt;
-            if (movingRight) ship.pos[0] += shipSpeed * dt;
-        }
 
         // debug option, remember to delete this
         if (input.isDown("i")) {
@@ -525,7 +618,7 @@
         }
 
         for (var i=0; i<indicators.length; i++) {
-            if (role == "sub" && numTorpedoes > torpedoes.length && Date.now() - lastFireTorpedo > 1250 && input.isDown(indicators[i].value.toString())) {
+            if (role == "sub" && numTorpedoes > torpedoes.length && Date.now() - lastFireTorpedo > 1350 && input.isDown(indicators[i].value.toString())) {
                 var pos = subs[i].pos;
                 var updateSub = [i, subs[i].pos];
                 launchTorpedo([pos[0] + subs[i].sprite.size[0]/2, pos[1]], updateSub);
@@ -537,7 +630,6 @@
         // Update the player sprite animation
         ship.sprite.update(dt);
         checkShipBounds();
-        //if (role == "ship") sendShipPosition();
 
         // Update subs
         for (i=0; i<subs.length; i++) {
@@ -546,11 +638,9 @@
             ss.update(dt);
             s.pos[0] += s.speed * dt;
             var p = points[i];
-            //if (!ss.isSinking && p) { 
-                p.pos[0] = s.pos[0] + ss.size[0]/2 - (ss.flip*7);
-                p.pos[1] = s.pos[1] + ss.size[1]/2;
-                p.sprite.update(dt);
-            //}
+            p.pos[0] = s.pos[0] + ss.size[0]/2 - (ss.flip*7);
+            p.pos[1] = s.pos[1] + ss.size[1]/2;
+            p.sprite.update(dt);
             if (ss.done) {
                 subs.splice(i, 1);
                 points.splice(i, 1);
@@ -769,6 +859,13 @@
         if (isGameOver) {
             var txt = scorePlayerShip > scorePlayerSub ? playerShipName + " WINS!" : scorePlayerShip == scorePlayerSub ? "DRAW!" : playerSubName + " WINS!";
             drawText(canvas.width/2, canvas.height/2, txt, "white");
+            drawText(canvas.width/2, canvas.height/2 + 20, "Please reload (F5) to play again.", "white");
+        }
+        
+        // print tutorial texts
+        if (demoMode && tutCnt++ % 2 == 0) {
+            drawText(128, 40, tutoTxt1, "yellow", 8);
+            drawText(128, 150, tutoTxt2, "yellow", 8);
         }
 
         // render bodyCount
