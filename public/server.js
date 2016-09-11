@@ -1,180 +1,1 @@
-/**
- * User sessions
- * @param {array} users
- */
-var users = [];
-
-/**
- * Find opponent for a user
- * @param {User} user
- */
-function findOpponent(user) {
-	for (var i = 0; i < users.length; i++) {
-		if (user !== users[i] && users[i].opponent === null) {
-			new Game(user, users[i]).start();
-		}
-	}
-}
-
-/**
- * Remove user session
- * @param {User} user
- */
-function removeUser(user) {
-	users.splice(users.indexOf(user), 1);
-}
-
-/**
- * Game class
- * @param {User} user1
- * @param {User} user2
- */
-function Game(user1, user2) {
-    user1.role = "sub";
-    user2.role = "ship";
-	this.user1 = user1;
-	this.user2 = user2;
-    this.lG = Math.floor(Math.random()*5) + 5;
-    this.cnt = 0;
-}
-
-function generateGlitch() {
-    var glitch = [];
-    var q = rand(30, 60);
-    for (var j=0; j<q; j++) {
-        var pos = [rand(0, 256), rand(0, 216)];
-        var size = [rand(10, 30), rand(15, 40)];
-        var color = [rand(0, 255), rand(0, 255), rand(0, 255), Math.random()*0.5 + 0.5];
-        glitch.push([pos, size, color]);
-    }
-    return glitch;
-}
-
-function rand(a, b) {
-    return Math.floor(Math.random() * (b-a+1)) + a;
-}
-
-function checkG(u) {
-    if (u.game.cnt++ > u.game.lG) {
-        u.game.cnt = 0;
-        u.game.lG = Math.floor(Math.random()*5) + 5;
-        
-        var q = rand(2, 7);
-        var gs = [];
-        for (var i=0; i<q; i++) {
-            var g = generateGlitch();
-            var t = rand(75, 500);
-            gs.push([g, t]);
-        }
-        u.socket.emit("glitch", gs);
-        u.opponent.socket.emit("glitch", gs);
-        
-        if (rand(0, 1)) {
-            var p = Math.PI;
-            var r = [];
-            r[0] = rand(0, 1) ? p/2 : rand(0,1) ? -p/2 : p;
-            r[1] = rand(-25, 25);
-            r[2] = rand(-25, 25);
-            var t = rand(1500, 3500);
-            u.socket.emit("rot", r, t);
-            u.opponent.socket.emit("rot", r, t);
-        }
-    } 
-}
-
-/**
- * Start new game
- */
-Game.prototype.start = function () {
-	this.user1.start(this, this.user2);
-	this.user2.start(this, this.user1);
-}
-
-/**
- * User session class
- * @param {Socket} socket
- */
-function User(socket) {
-	this.socket = socket;
-	this.game = null;
-	this.opponent = null;
-}
-
-User.prototype.start = function (game, opponent) {
-	this.game = game;
-	this.opponent = opponent;
-	var cfg = {
-        p1: this.name,
-        p2: this.opponent.name,
-        role: this.role
-    };
-	this.socket.emit("start", cfg);		
-};
-
-User.prototype.end = function () {
-	this.socket.emit("end");
-    this.game = null;
-    this.opponent = null;
-};
-
-module.exports = function (socket) {
-	var user = new User(socket);
-	
-	socket.on("disconnect", function () {
-		console.log("Disconnected: " + socket.id);
-        removeUser(user);
-		if (user.opponent) {
-            user.opponent.end();
-            findOpponent(user.opponent);
-		}
-	});
-/*
-    socket.on("shipPosition", function (pos) {
-		//console.log("Ship position: " + socket.id + " -> " + pos);
-        user.opponent.socket.emit("shipPosition", pos);
-	});
-*/  
-    socket.on("controls", function (ev, pos) {
-		//console.log("Ship controls: " + socket.id + " -> " + ev);
-        user.opponent.socket.emit("controls", ev, pos);
-	});
-    
-    socket.on("syncronizeSunk", function (score) {
-		console.log("Ship is sunk! " + socket.id);
-        user.opponent.socket.emit("syncronizeSunk", score);
-	});
-    
-    socket.on("launchCharge", function (pos) {
-		//console.log("LaunchCharge: " + socket.id + " -> " + pos);
-        user.opponent.socket.emit("launchCharge", pos);
-        checkG(user);
-	});
-    
-    socket.on("launchSub", function (cfg) {
-		//console.log("LaunchSub: " + socket.id + " -> " + cfg.levels);
-        user.opponent.socket.emit("launchSub", cfg);
-	});    
-    
-    socket.on("silent", function () {
-        user.opponent.socket.emit("silent");
-	});  
-    
-    socket.on("launchTorpedo", function (pos, updateSub) {
-		//console.log("launchTorpedo: " + socket.id + " -> " + pos);
-        user.opponent.socket.emit("launchTorpedo", pos, updateSub);
-        checkG(user);
-	});
-    
-	socket.on("name", function (name) {
-		console.log("Name for: " + socket.id + " -> " + name);
-		user.name = name;
-        users.push(user);
-        findOpponent(user);
-        console.log("Current users: " + users.length);
-	});
-    
-    user.socket.emit("welcome", users.length+1);
-    
-	console.log("Connected: " + socket.id);
-    console.log("Current users: " + users.length);
-};
+for(_='rol~on|",qc|t~sq`.~e="s_socket^userZZsYthisXX.WstartV.V(X,WZRenQY.lQgthNUserLremoveLKreturn JY[b]HnullF=0;bEfuncti|DD(B(bA=[@.^.emit("99rotqh,f8launch%%Chargeq$)}#%Torpedoqrand(]=-25,250,),255var for(Math.floor(random()lG=5*)+59glitchqccheckG.push(.opp|Qtb9}D a,amea.g.	syncr|izeSunkqgQerateGlitch(){Wg=F,X=F}.prototype.findOpp|Qt(a#a.|("D bE<N;b++)a!==H&&F===H&&new G(H).V()KY.splice(Y.indexOf(a1)G(ba_ubqb_hipqWZ1=WZ2=b,W,Wcnt=0a@],b=30,60cE>c;c++d@256216)],e@10,3015,40)],f@.5*+.5];a[d,e,f]#JabJ*A-a+1))+aif(	cnt++>	lG	cnt=0,	;b=2,7c@],dE>d;d++e=f=75,500);c[e,f]#if(aa1)g=PI,h@];h[0]=1)?g/2:1)?-g/2:g,h[1h[2);f=1500,3500);a8a8#}LW^=Y@];GV=BWZ1R2WZ2R1#,LV=BbWg=X=b;c={p1:Wn,p2:X.n,~e:W~e};X9Vqc#,LQd=BX9Qd",module.exports=Db=new L(a);a.|("disc|nectqBKAb&&A.Qd(A)`Bc`cDa$D$aA%SubqD%SubqasilQtqBsilQt"BccAnqDb.n=YbA#b9welcomeqN+1#;';G=/[^ -"&-7:-?CGIMOPS-U[\]a-pr-{}]/.exec(_);)with(_.split(G))_=join(shift());eval(_)
