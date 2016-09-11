@@ -1,4 +1,4 @@
-# subs-multiplayer
+# Glitch torpedo
 "Glitch torpedo", my 2016 js13k submission, is a multiplayer sea battle online arcade game, 
 based on Gremlin's "Depthcharge" arcade machine (1977).
 
