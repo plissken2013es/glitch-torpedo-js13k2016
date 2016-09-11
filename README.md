@@ -13,8 +13,6 @@ any of them by using number keys (1 to 8). The deepest torpedo launches score mo
 Moreover, Sub player may enter "Silent running" mode by pressing SPACE once per game: 
 the subs will become invisible to the Ship player for a few seconds.
 
-Any time toggle MUSIC on/off by pressing M key.
-
 When time is over, the best score wins.
 
 Important note: remember that this is and old arcade machine and some undesired bugs or
