@@ -5,7 +5,8 @@
 
 ## Context
 
-"Glitch torpedo" is my 2016 [js13kGames](http://js13kgames.com/entries/2016) submission, a multiplayer sea battle online arcade game, based on Gremlin's "Depthcharge" arcade machine (1977). The goal of the compo is to make a game in less than 13k of zipped JavaScript. Theme was "glitch". 
+"Glitch torpedo" is my 2016 [js13kGames](http://js13kgames.com/entries/2016) submission, a multiplayer sea battle online arcade game, based on Gremlin's "Depthcharge" arcade machine (1977). 
+The goal of the compo is to make a game in less than 13k of zipped JavaScript. Theme was "glitch". 
 
 ## Instructions:
 
@@ -32,4 +33,16 @@ Good luck, Captain!
 - [jsfxr.js](https://github.com/mneubrand/jsfxr) for the audio (5 sounds)
 - Socket.io server logic based on [js13kgames server](https://github.com/js13kGames/js13kserver)
 
+## Making the server logic
 
+> A non exhaustive summary about the server and the client doing their thing
+
+Last year, I spent a lot of time creating a [brand new game featuring "shiny" mechanics](http://js13kgames.com/entries/battle-of-mages-in-the-unireverse) and couldn't add the server logic at the very end.
+This time, I wanted to do differently. So I started by creating the working local 2-player version of the game in a few days, and then direct all my efforts to do the server magic (one thing I had never did before). 
+
+### Only two players per room
+
+Basically, when a player arrives to the server and enters his/her name, looks for any non-paired player that arrived before. If found, the player that was waiting will take the "destroyer" role and the incoming player will be the "sub commander".
+
+If there's no available player, the incoming user will add to the queue and wait for a new player to come. He/she will play as "destroyer captain" when this happens.
+[Code is here](public/server_noCompress.js)
