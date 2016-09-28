@@ -44,5 +44,33 @@ This time, I wanted to do differently. So I started by creating the working loca
 
 Basically, when a player arrives to the server and enters his/her name, looks for any non-paired player that arrived before. If found, the player that was waiting will take the "destroyer" role and the incoming player will be the "sub commander".
 
-If there's no available player, the incoming user will add to the queue and wait for a new player to come. He/she will play as "destroyer captain" when this happens.
-[Code is here](public/server_noCompress.js)
+If there's no available player, the incoming user will add to the queue and wait for a new player to come. He/she will play as "destroyer captain" when this happens. [Code is here](public/server_noCompress.js).
+
+### The 'glitch effect' is generated on the server side
+
+The 'glitch effect' is generated on the server side
+
+When a game is created on the server, a limit number between 5 and 10 is chosen and a counter is set to 0. The torpedo and deep charge signals, coming from the clients, increment this counter one unit each. If the chosen limit is exceeded, the server script generates a unique glitch object that is sent to the two players, so they suffer the same effects. [Code is here again](public/server_noCompress.js).
+
+A main canvas draws everything in its correct position while a second canvas is used to the the scale and rotation tricks.
+
+### Moving the ship
+
+The first approach that I used was to send the ship position to the server every 34 milliseconds. And all the way back to the submarine player. Undesirable effects appeared.
+
+A simplier solution was to send the "destroyer player" keyDown and keyUp events only, so the ship movement was smoother. And add the ship position to the keyUp event message, so the final ship position were accurate.
+
+### Moving the subs
+
+The subs are generated pseudo-randomly by the client part when its role is "submarine player", then their position and potential score are sent to the server and all the way back to the "ship player".
+
+When a torpedo is launched by the sub player, that submarine position is sent to the server too. This way the ship player client can create the torpedo in his/her screen and update the sub position to prevent small differences. And the network traffic is kept to a minimum.
+
+### Synchronizing sunk event
+
+However, I found a case in that the destroyer sometimes was sunk in one screen and not in the other. So I added a kind of watchdog or "sunk-syncro-system" that tells the server to inform the other player when the ship is hit. The score is synced, too.
+
+## Some final tips
+
+
+
