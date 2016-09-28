@@ -1,7 +1,7 @@
 # Glitch torpedo
 [![](https://img.shields.io/badge/js13kGames-2016-b12a34.svg)](http://js13kgames.com/) [![](https://img.shields.io/badge/desktop-%23-----yellow.svg)](http://2016.js13kgames.com/#winners)   [![](https://img.shields.io/badge/server-%234-yellow.svg)](http://2016.js13kgames.com/#winners-server)
 
-[PLAY](https://glitch-torpedo.herokuapp.com/l) (need a friend) – [entry](http://js13kgames.com/entries/glitch-torpedo)
+[PLAY](https://glitch-torpedo.herokuapp.com/) (need a friend) – [entry](http://js13kgames.com/entries/glitch-torpedo)
 
 ## Context
 
