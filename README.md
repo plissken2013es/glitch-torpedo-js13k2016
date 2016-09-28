@@ -74,8 +74,8 @@ However, I found a case in that the destroyer sometimes was sunk in one screen a
 
 That's pretty much it, but I'd like to give some tips on developing a JS13k game.
 
-- I didn't do any JavaScript tricks to save bytes until I was forced to, at the very last days of the compo. 
+- I don't recommend to do any JavaScript tricks to save bytes until I was forced to, at the very last days of the compo. 
 
 - I tried to make sure that my game was running first, and then I improved it and added the server logic. Having readable and maintainable code was very important throughout this process.
 
-- I tried to use functional style and avoid OO-style. Arrays could be as useful as an object to store position, velocity, etc. and why not use alot of functions instead of object methods?
+- Finally: don't even think on starting to work before studying all the precious resources, tutorials and postmostems available at the [js13kgames website](http://js13kgames.github.io/resources/).
