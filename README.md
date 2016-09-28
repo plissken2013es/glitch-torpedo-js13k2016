@@ -1,9 +1,14 @@
 # Glitch torpedo
-[![](https://img.shields.io/badge/js13kGames-2016-b12a34.svg)](http://js13kgames.com/) [![](https://img.shields.io/badge/desktop-%23-----yellow.svg)](http://2016.js13kgames.com/#winners)   [![](https://img.shields.io/badge/community-%234-yellow.svg)](http://2016.js13kgames.com/#winners-server)
-"Glitch torpedo", my 2016 js13k submission, is a multiplayer sea battle online arcade game, 
-based on Gremlin's "Depthcharge" arcade machine (1977).
+[![](https://img.shields.io/badge/js13kGames-2016-b12a34.svg)](http://js13kgames.com/) [![](https://img.shields.io/badge/desktop-%23-----yellow.svg)](http://2016.js13kgames.com/#winners)   [![](https://img.shields.io/badge/server-%234-yellow.svg)](http://2016.js13kgames.com/#winners-server)
 
-INSTRUCTIONS:
+[PLAY (need a friend)](https://glitch-torpedo.herokuapp.com/l) – [entry](http://js13kgames.com/entries/glitch-torpedo)
+
+## Context
+
+"Glitch torpedo" is my 2016 [js13kGames](http://js13kgames.com/entries/2016) submission, a multiplayer sea battle online arcade game, based on Gremlin's "Depthcharge" arcade machine (1977). The goal of the compo is to make a game in less than 13k of zipped JavaScript. Theme was "glitch". 
+
+## Instructions:
+
 Ship commander may use LEFT/RIGHT arrows (or A and D keys) to move destroyer. 
 Z and X keys launch depth charges (M and N does the same).
 The ship has 5 charges available, reloaded on explosiones.
@@ -21,22 +26,10 @@ Important note: remember that this is and old arcade machine and some undesired 
 
 Good luck, Captain!
 
+# Tech overview
 
-TO-DOs:
-(done) Limit the number of characters for the player names
-(done) Hide the info screen
-(done) Solve the sub score issues
-(done) Solve the disconnection issues
-(done) Check if server supports multiple connections and disconnections
-(done) Number of online players
-(done) Latency time for ship after being sunk
-(done) Syncronize sinking
-(done) Improve ship movement network traffic
-(done) Add glitchs, rotations and screen magic to add fun
-(done) Add small tutorial
-(done) Paint a nice? cover for this game
-(done) Add ninja mode for subs (optional)
-(done) Add music (optional)
-(done) Remove console.logs & join JS in one file
-- Review disconnection issues with 2 players
-- Give replay option to players at game end
+- Canvas2D is used for all the drawing
+- [jsfxr.js for the audio](https://github.com/mneubrand/jsfxr) (5 sounds)
+- [Socket.io server logic based on js13kgames server](https://github.com/js13kGames/js13kserver)
+
+
